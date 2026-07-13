@@ -1,5 +1,5 @@
 import type { MouseEventHandler, ReactNode, SyntheticEvent } from 'react';
-import type { LcBaseProps, LcEventCardVariant, LcEventSummary, LcNavItem, LcShelf } from './types';
+import type { LcBaseProps, LcEventCardVariant, LcEventListGroup, LcEventSummary, LcNavItem, LcShelf } from './types';
 type DataAttributes = Record<string, string | number | undefined>;
 export interface LcProviderProps extends LcBaseProps {
     surface?: 'dark' | 'light';
@@ -77,6 +77,30 @@ export interface LcEditorialShelfProps {
     onTagClick?: (tag: string) => void;
 }
 export declare function LcEditorialShelf({ shelf, columns, className, onTagClick }: LcEditorialShelfProps): import("react").JSX.Element;
+export interface LcEventListItemProps {
+    event: LcEventSummary;
+    className?: string;
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
+    onVenueClick?: MouseEventHandler<HTMLAnchorElement>;
+    onSeriesClick?: MouseEventHandler<HTMLAnchorElement>;
+    onTagClick?: (tag: string, event: LcEventSummary) => void;
+    linkTarget?: string;
+    linkRel?: string;
+}
+export declare function LcEventListItem({ event, className, onClick, onVenueClick, onSeriesClick, onTagClick, linkTarget, linkRel }: LcEventListItemProps): import("react").JSX.Element;
+export interface LcEventListProps {
+    groups: LcEventListGroup[];
+    className?: string;
+    headingLevel?: 2 | 3 | 4;
+    stickyHeadings?: boolean;
+    onTagClick?: (tag: string, event: LcEventSummary) => void;
+    onEventClick?: (event: LcEventSummary) => void;
+    onVenueClick?: (event: LcEventSummary) => void;
+    onSeriesClick?: (event: LcEventSummary) => void;
+    linkTarget?: string;
+    linkRel?: string;
+}
+export declare function LcEventList({ groups, className, headingLevel, stickyHeadings, onTagClick, onEventClick, onVenueClick, onSeriesClick, linkTarget, linkRel }: LcEventListProps): import("react").JSX.Element;
 export interface LcHomepageBandProps extends LcBaseProps {
     title?: string;
     actionLabel?: string;

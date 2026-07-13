@@ -46,7 +46,26 @@ export function LcEventCard({ event, variant = 'standard', className, onTagClick
 export function LcEditorialShelf({ shelf, columns = 4, className, onTagClick }) {
     return (_jsxs("section", { className: classNames('lc-editorial-shelf', className), style: { '--lc-shelf-columns': columns }, children: [_jsx(LcSectionHeading, { title: shelf.title, actionLabel: shelf.actionLabel, actionHref: shelf.actionHref }), _jsx("div", { className: "lc-editorial-shelf__rail", role: "list", "aria-label": shelf.title, children: shelf.items.map((item) => (_jsx("div", { role: "listitem", children: _jsx(LcEventCard, { event: item, variant: "feature", onTagClick: onTagClick }) }, `${shelf.id}-${item.title}`))) })] }));
 }
+export function LcEventListItem({ event, className, onClick, onVenueClick, onSeriesClick, onTagClick, linkTarget, linkRel }) {
+    const tags = event.tags ?? [];
+    const isDisabled = event.disabled;
+    const detailsId = event.assistiveLabel ? `lc-event-list-${slugifyForId(event.id ?? event.title)}-details` : undefined;
+    const title = isDisabled || !event.href ? (_jsx("p", { className: "lc-event-list-item__title", children: event.title })) : (_jsx("a", { className: "lc-event-list-item__title-link", href: event.href, target: linkTarget, rel: linkRel, "aria-describedby": detailsId, onClick: onClick, children: _jsx("p", { className: "lc-event-list-item__title", children: event.title }) }));
+    const venue = event.venue ? (isDisabled || !event.venueHref ? (_jsx("span", { className: "lc-event-list-item__venue", children: event.venue })) : (_jsx("a", { className: "lc-event-list-item__venue", href: event.venueHref, target: linkTarget, rel: linkRel, "aria-describedby": detailsId, onClick: onVenueClick, children: event.venue }))) : null;
+    return (_jsxs("article", { className: classNames('lc-event-list-item', isDisabled && 'lc-event-list-item--disabled', className), role: "listitem", children: [event.assistiveLabel ? (_jsx("p", { id: detailsId, className: "lc-sr-only", children: event.assistiveLabel })) : null, event.seriesTitle ? (isDisabled || !event.seriesUrl ? (_jsx("span", { className: "lc-event-list-item__series", children: event.seriesTitle })) : (_jsx("a", { className: "lc-event-list-item__series", href: event.seriesUrl, target: linkTarget, rel: linkRel, "aria-describedby": detailsId, onClick: onSeriesClick, children: event.seriesTitle }))) : null, title, event.subtitle ? _jsx("p", { className: "lc-event-list-item__subtitle", children: event.subtitle }) : null, venue, event.timeLabel || event.dateLabel ? _jsx("p", { className: "lc-event-list-item__time", children: event.timeLabel ?? event.dateLabel }) : null, tags.length > 0 ? (_jsx("div", { className: "lc-event-list-item__tags", "aria-label": "Event tags", children: tags.map((tag) => isDisabled ? (_jsx("span", { className: "lc-event-list-item__tag lc-event-list-item__tag--static", children: tag }, tag)) : (_jsx("button", { className: "lc-event-list-item__tag", type: "button", onClick: () => onTagClick?.(tag, event), children: tag }, tag))) })) : null] }));
+}
+export function LcEventList({ groups, className, headingLevel = 3, stickyHeadings = true, onTagClick, onEventClick, onVenueClick, onSeriesClick, linkTarget, linkRel }) {
+    const Heading = `h${headingLevel}`;
+    return (_jsx("div", { className: classNames('lc-event-list', stickyHeadings && 'lc-event-list--sticky-headings', className), children: groups.map((group) => (_jsxs("section", { className: "lc-event-list__group", children: [_jsx(Heading, { className: "lc-event-list__heading", children: group.heading }), _jsx("div", { className: "lc-event-list__items", role: "list", "aria-label": group.heading, children: group.events.map((event, index) => (_jsx(LcEventListItem, { event: event, onClick: () => onEventClick?.(event), onVenueClick: () => onVenueClick?.(event), onSeriesClick: () => onSeriesClick?.(event), onTagClick: onTagClick, linkTarget: linkTarget, linkRel: linkRel }, `${group.id}-${event.href ?? event.title}-${index}`))) })] }, group.id))) }));
+}
 export function LcHomepageBand({ title, actionLabel, actionHref, className, children }) {
     return (_jsxs("section", { className: classNames('lc-homepage-band', className), children: [title ? _jsx(LcSectionHeading, { title: title, actionLabel: actionLabel, actionHref: actionHref }) : null, children] }));
+}
+function slugifyForId(value) {
+    return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 48);
 }
 //# sourceMappingURL=components.js.map

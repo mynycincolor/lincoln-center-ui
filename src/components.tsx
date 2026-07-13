@@ -1,5 +1,5 @@
 import type { CSSProperties, MouseEventHandler, ReactNode, SyntheticEvent } from 'react';
-import type { LcBaseProps, LcEventCardVariant, LcEventSummary, LcNavItem, LcShelf } from './types';
+import type { LcBaseProps, LcEventCardVariant, LcEventListGroup, LcEventSummary, LcNavItem, LcShelf } from './types';
 
 function classNames(...values: Array<string | false | null | undefined>): string {
   return values.filter(Boolean).join(' ');
@@ -308,6 +308,159 @@ export function LcEditorialShelf({ shelf, columns = 4, className, onTagClick }: 
   );
 }
 
+export interface LcEventListItemProps {
+  event: LcEventSummary;
+  className?: string;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+  onVenueClick?: MouseEventHandler<HTMLAnchorElement>;
+  onSeriesClick?: MouseEventHandler<HTMLAnchorElement>;
+  onTagClick?: (tag: string, event: LcEventSummary) => void;
+  linkTarget?: string;
+  linkRel?: string;
+}
+
+export function LcEventListItem({
+  event,
+  className,
+  onClick,
+  onVenueClick,
+  onSeriesClick,
+  onTagClick,
+  linkTarget,
+  linkRel
+}: LcEventListItemProps) {
+  const tags = event.tags ?? [];
+  const isDisabled = event.disabled;
+  const detailsId = event.assistiveLabel ? `lc-event-list-${slugifyForId(event.id ?? event.title)}-details` : undefined;
+  const title = isDisabled || !event.href ? (
+    <p className="lc-event-list-item__title">{event.title}</p>
+  ) : (
+    <a
+      className="lc-event-list-item__title-link"
+      href={event.href}
+      target={linkTarget}
+      rel={linkRel}
+      aria-describedby={detailsId}
+      onClick={onClick}
+    >
+      <p className="lc-event-list-item__title">{event.title}</p>
+    </a>
+  );
+  const venue = event.venue ? (
+    isDisabled || !event.venueHref ? (
+      <span className="lc-event-list-item__venue">{event.venue}</span>
+    ) : (
+      <a
+        className="lc-event-list-item__venue"
+        href={event.venueHref}
+        target={linkTarget}
+        rel={linkRel}
+        aria-describedby={detailsId}
+        onClick={onVenueClick}
+      >
+        {event.venue}
+      </a>
+    )
+  ) : null;
+
+  return (
+    <article className={classNames('lc-event-list-item', isDisabled && 'lc-event-list-item--disabled', className)} role="listitem">
+      {event.assistiveLabel ? (
+        <p id={detailsId} className="lc-sr-only">
+          {event.assistiveLabel}
+        </p>
+      ) : null}
+      {event.seriesTitle ? (
+        isDisabled || !event.seriesUrl ? (
+          <span className="lc-event-list-item__series">{event.seriesTitle}</span>
+        ) : (
+          <a
+            className="lc-event-list-item__series"
+            href={event.seriesUrl}
+            target={linkTarget}
+            rel={linkRel}
+            aria-describedby={detailsId}
+            onClick={onSeriesClick}
+          >
+            {event.seriesTitle}
+          </a>
+        )
+      ) : null}
+      {title}
+      {event.subtitle ? <p className="lc-event-list-item__subtitle">{event.subtitle}</p> : null}
+      {venue}
+      {event.timeLabel || event.dateLabel ? <p className="lc-event-list-item__time">{event.timeLabel ?? event.dateLabel}</p> : null}
+      {tags.length > 0 ? (
+        <div className="lc-event-list-item__tags" aria-label="Event tags">
+          {tags.map((tag) =>
+            isDisabled ? (
+              <span key={tag} className="lc-event-list-item__tag lc-event-list-item__tag--static">
+                {tag}
+              </span>
+            ) : (
+              <button key={tag} className="lc-event-list-item__tag" type="button" onClick={() => onTagClick?.(tag, event)}>
+                {tag}
+              </button>
+            )
+          )}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+export interface LcEventListProps {
+  groups: LcEventListGroup[];
+  className?: string;
+  headingLevel?: 2 | 3 | 4;
+  stickyHeadings?: boolean;
+  onTagClick?: (tag: string, event: LcEventSummary) => void;
+  onEventClick?: (event: LcEventSummary) => void;
+  onVenueClick?: (event: LcEventSummary) => void;
+  onSeriesClick?: (event: LcEventSummary) => void;
+  linkTarget?: string;
+  linkRel?: string;
+}
+
+export function LcEventList({
+  groups,
+  className,
+  headingLevel = 3,
+  stickyHeadings = true,
+  onTagClick,
+  onEventClick,
+  onVenueClick,
+  onSeriesClick,
+  linkTarget,
+  linkRel
+}: LcEventListProps) {
+  const Heading = `h${headingLevel}` as keyof JSX.IntrinsicElements;
+
+  return (
+    <div className={classNames('lc-event-list', stickyHeadings && 'lc-event-list--sticky-headings', className)}>
+      {groups.map((group) => (
+        <section key={group.id} className="lc-event-list__group">
+          <Heading className="lc-event-list__heading">{group.heading}</Heading>
+          <div className="lc-event-list__items" role="list" aria-label={group.heading}>
+            {group.events.map((event, index) => (
+              <LcEventListItem
+                key={`${group.id}-${event.href ?? event.title}-${index}`}
+                event={event}
+                onClick={() => onEventClick?.(event)}
+                onVenueClick={() => onVenueClick?.(event)}
+                onSeriesClick={() => onSeriesClick?.(event)}
+                onTagClick={onTagClick}
+                linkTarget={linkTarget}
+                linkRel={linkRel}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 export interface LcHomepageBandProps extends LcBaseProps {
   title?: string;
   actionLabel?: string;
@@ -321,4 +474,12 @@ export function LcHomepageBand({ title, actionLabel, actionHref, className, chil
       {children}
     </section>
   );
+}
+
+function slugifyForId(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
 }

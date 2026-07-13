@@ -9,11 +9,14 @@ export interface LcNavItem {
 }
 
 export interface LcEventSummary {
+  id?: string;
   title: string;
   eyebrow?: string;
   dateLabel?: string;
+  timeLabel?: string;
   seriesTitle?: string;
   seriesUrl?: string;
+  subtitle?: string;
   venue?: string;
   venueHref?: string;
   href?: string;
@@ -21,6 +24,8 @@ export interface LcEventSummary {
   imageAlt?: string;
   badge?: string;
   tags?: string[];
+  assistiveLabel?: string;
+  disabled?: boolean;
 }
 
 export interface LcShelf {
@@ -29,6 +34,12 @@ export interface LcShelf {
   actionLabel?: string;
   actionHref?: string;
   items: LcEventSummary[];
+}
+
+export interface LcEventListGroup {
+  id: string;
+  heading: string;
+  events: LcEventSummary[];
 }
 
 export interface LcBaseProps {
