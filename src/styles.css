@@ -6,6 +6,20 @@
   font-display: swap;
 }
 
+:root {
+  --lc-color-ink: #161412;
+  --lc-color-muted: #5f5952;
+  --lc-color-paper: #f7f3ed;
+  --lc-color-warm: #efe6d8;
+  --lc-color-white: #ffffff;
+  --lc-color-red: #9d1f2d;
+  --lc-color-red-dark: #721721;
+  --lc-color-gold: #bd8b2f;
+  --lc-color-sage: #53685d;
+  --lc-color-blue: #283f59;
+  --lc-color-line: rgba(22, 20, 18, 0.16);
+}
+
 .lc-ui {
   --lc-color-ink: #161412;
   --lc-color-muted: #5f5952;
@@ -33,6 +47,21 @@
   --lc-shadow: 0 18px 50px rgba(22, 20, 18, 0.14);
   color: var(--lc-text);
   font-family: Karla, Arial, sans-serif;
+}
+
+.lc-surface-paper {
+  background: var(--lc-color-paper, #f7f3ed);
+  color: var(--lc-color-ink, #161412);
+}
+
+.lc-surface-warm {
+  background: var(--lc-color-warm, #efe6d8);
+  color: var(--lc-color-ink, #161412);
+}
+
+.lc-surface-ink {
+  background: var(--lc-color-ink, #161412);
+  color: var(--lc-color-paper, #f7f3ed);
 }
 
 .lc-ui--light {
